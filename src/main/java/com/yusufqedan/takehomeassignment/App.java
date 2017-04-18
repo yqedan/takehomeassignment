@@ -1,5 +1,6 @@
 package com.yusufqedan.takehomeassignment;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.yusufqedan.takehomeassignment.models.Channel;
 import com.yusufqedan.takehomeassignment.models.NamedUser;
 
@@ -21,11 +22,33 @@ public class App {
 
         Gson gson = new Gson();
         post("/api/named_users/associate",(req, res) ->{
-            JsonInput input = gson.fromJson(req.body(), JsonInput.class);
+            JsonInput input;
+            res.type("application/json");
+            NamedUser userToAssociateChannel;
+
+            try{
+                input = gson.fromJson(req.body(), JsonInput.class);
+            }catch (JsonSyntaxException e){
+                res.status(400);
+                return "{\"Incorrect request body format\": true}";
+            }
+
             String namedUserIdInput = input.getNamed_user_id();
             String channelIdInput = input.getChannel_id();
             String deviceTypeInput = input.getDevice_type();
-            NamedUser userToAssociateChannel;
+
+            if(namedUserIdInput == null || namedUserIdInput.equals("")){
+                res.status(400);
+                return "{\"Named user id not specified\": true}";
+            }
+            if(channelIdInput == null || channelIdInput.equals("")){
+                res.status(400);
+                return "{\"Channel id not specified\": true}";
+            }
+            if(deviceTypeInput == null || deviceTypeInput.equals("")){
+                res.status(400);
+                return "{\"Device type not specified\": true}";
+            }
 
             //fake database query
             int i;
@@ -39,10 +62,17 @@ public class App {
             System.out.println(gson.toJson(allUsers.get(i)));
 
             userToAssociateChannel = allUsers.get(i);
+
+            if(userToAssociateChannel.getChannels().size() >= 20){
+                res.status(405);
+                return "{\"Exceeded the maximum number of channels for this user\": true}";
+            }
+
+            //fake save the user to the database
             userToAssociateChannel.addChannel(new Channel(deviceTypeInput,channelIdInput));
+
             System.out.println(gson.toJson(allUsers.get(i)));
 
-            res.type("application/json");
             return "{\"ok\": true}";
         });
     }
