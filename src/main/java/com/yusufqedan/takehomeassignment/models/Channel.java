@@ -11,4 +11,17 @@ public class Channel {
         this.device_type = device_type;
         this.channel_id = channel_id;
     }
+
+    public String getChannel_id() {
+        return channel_id;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof Channel){
+            Channel otherChannel = (Channel) obj;
+            return otherChannel.getChannel_id().equals(this.channel_id);
+        }
+        return false;
+    }
 }

@@ -30,7 +30,7 @@ public class NamedUser {
     public boolean equals(Object obj){
         if(obj instanceof NamedUser){
             NamedUser otherUser = (NamedUser) obj;
-            return otherUser.getNamed_user_id().equals(this.getNamed_user_id());
+            return otherUser.getNamed_user_id().equals(this.named_user_id);
         }
         return false;
     }

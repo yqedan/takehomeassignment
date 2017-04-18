@@ -68,8 +68,20 @@ public class App {
                 return "{\"Exceeded the maximum number of channels for this user\": true}";
             }
 
+            List<Channel> usersChannels = userToAssociateChannel.getChannels();
+            Channel channelToAssociate = new Channel(deviceTypeInput,channelIdInput);
+
+            //test for duplicate channel
+            int j;
+            for(j = 0; j < usersChannels.size(); j++){
+                if(usersChannels.get(j).equals(channelToAssociate)){
+                    res.status(405);
+                    return "{\"User already has this channel id associated\": true}";
+                }
+            }
+
             //fake save the user to the database
-            userToAssociateChannel.addChannel(new Channel(deviceTypeInput,channelIdInput));
+            userToAssociateChannel.addChannel(channelToAssociate);
 
             System.out.println(gson.toJson(allUsers.get(i)));
 
