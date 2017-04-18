@@ -25,4 +25,16 @@ public class NamedUser {
     public ArrayList<Channel> getChannels() {
         return channels;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof NamedUser){
+            NamedUser otherUser = (NamedUser) obj;
+            if(otherUser.getNamed_user_id().equals(this.getNamed_user_id())){
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 }
