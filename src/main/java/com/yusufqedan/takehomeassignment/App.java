@@ -11,10 +11,10 @@ import static spark.Spark.*;
 
 
 public class App {
+    //my fake database
+    private static List<NamedUser> allUsers = new ArrayList<>();
 
     public static void main(String[] args) {
-        //my fake database
-        List<NamedUser> allUsers = new ArrayList<>();
         allUsers.add(new NamedUser("user-id-abcd"));
         NamedUser namedUser = new NamedUser("user-id-1234");
         namedUser.addChannel(new Channel("ios","df6a6b50-9843-0304-d5a5-743f246a4946"));
@@ -53,7 +53,12 @@ public class App {
                 return "{\"Device type not specified\": true}";
             }
 
-            userToAssociateChannel = getUserById(allUsers, namedUserIdInput);
+            userToAssociateChannel = getUserById(namedUserIdInput);
+
+            if(userToAssociateChannel == null){
+                res.status(400);
+                return "{\"User not found\": true}";
+            }
 
             if(userToAssociateChannel.getChannels().size() >= 20){
                 res.status(405);
@@ -110,7 +115,13 @@ public class App {
                 return "{\"Device type not specified\": true}";
             }
 
-            userToDisassociateChannel = getUserById(allUsers, namedUserIdInput);
+            userToDisassociateChannel = getUserById(namedUserIdInput);
+
+            if(userToDisassociateChannel == null){
+                res.status(400);
+                return "{\"User not found\": true}";
+            }
+
             Channel channelToDisassociate = new Channel(deviceTypeInput,channelIdInput);
 
             if(!userToDisassociateChannel.removeChannel(channelToDisassociate)){
@@ -123,11 +134,29 @@ public class App {
 
             return "{\"ok\": true}";
         });
+
+        get("/api/named_users/",(req, res) ->{
+            res.type("application/json");
+
+            String userIdInput = req.queryParams("id");
+            NamedUser requestedUser = getUserById(userIdInput);
+
+            if(requestedUser == null){
+                res.status(400);
+                return "{\"User not found\": true}";
+            }
+
+            return gson.toJson(requestedUser);
+        });
     }
 
-    private static NamedUser getUserById(List<NamedUser> allUsers, String namedUserIdInput) {
+    private static NamedUser getUserById(String namedUserIdInput) {
         //fake database query
-        return allUsers.get(allUsers.indexOf(new NamedUser(namedUserIdInput)));
+        NamedUser namedUser = new NamedUser(namedUserIdInput);
+        if(allUsers.indexOf(namedUser) == -1){
+            return null;
+        }
+        return allUsers.get(allUsers.indexOf(namedUser));
     }
 
     class JsonInput{
