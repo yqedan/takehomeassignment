@@ -56,7 +56,7 @@ public class App {
             userToAssociateChannel = getUserById(namedUserIdInput);
 
             if(userToAssociateChannel == null){
-                res.status(400);
+                res.status(404);
                 return "{\"User not found\": true}";
             }
 
@@ -118,14 +118,14 @@ public class App {
             userToDisassociateChannel = getUserById(namedUserIdInput);
 
             if(userToDisassociateChannel == null){
-                res.status(400);
+                res.status(404);
                 return "{\"User not found\": true}";
             }
 
             Channel channelToDisassociate = new Channel(deviceTypeInput,channelIdInput);
 
             if(!userToDisassociateChannel.removeChannel(channelToDisassociate)){
-                res.status(400);
+                res.status(405);
                 return "{\"Channel requested to be removed is not associated to user\": true}";
             }
 
@@ -142,7 +142,7 @@ public class App {
             NamedUser requestedUser = getUserById(userIdInput);
 
             if(requestedUser == null){
-                res.status(400);
+                res.status(404);
                 return "{\"User not found\": true}";
             }
 
@@ -164,15 +164,15 @@ public class App {
         private String device_type;
         private String named_user_id;
 
-        public String getChannel_id() {
+        String getChannel_id() {
             return channel_id;
         }
 
-        public String getDevice_type() {
+        String getDevice_type() {
             return device_type;
         }
 
-        public String getNamed_user_id() {
+        String getNamed_user_id() {
             return named_user_id;
         }
     }

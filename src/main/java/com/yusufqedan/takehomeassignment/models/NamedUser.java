@@ -22,10 +22,6 @@ public class NamedUser {
         return channels.remove(channel);
     }
 
-    public String getNamed_user_id() {
-        return named_user_id;
-    }
-
     public ArrayList<Channel> getChannels() {
         return channels;
     }
@@ -34,7 +30,7 @@ public class NamedUser {
     public boolean equals(Object obj){
         if(obj instanceof NamedUser){
             NamedUser otherUser = (NamedUser) obj;
-            return otherUser.getNamed_user_id().equals(this.named_user_id);
+            return otherUser.named_user_id.equals(this.named_user_id);
         }
         return false;
     }
