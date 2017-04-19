@@ -16,11 +16,14 @@ public class App {
         //my fake database
         List<NamedUser> allUsers = new ArrayList<>();
         allUsers.add(new NamedUser("user-id-abcd"));
-        allUsers.add(new NamedUser("user-id-1234"));
+        NamedUser namedUser = new NamedUser("user-id-1234");
+        namedUser.addChannel(new Channel("ios","df6a6b50-9843-0304-d5a5-743f246a4946"));
+        allUsers.add(namedUser);
         allUsers.add(new NamedUser("user-id-efgh"));
         allUsers.add(new NamedUser("user-id-5678"));
 
         Gson gson = new Gson();
+
         post("/api/named_users/associate",(req, res) ->{
             JsonInput input;
             res.type("application/json");
@@ -50,18 +53,7 @@ public class App {
                 return "{\"Device type not specified\": true}";
             }
 
-            //fake database query
-            int i;
-            for(i = 0; i < allUsers.size(); i++){
-                if(allUsers.get(i).getNamed_user_id().equals(namedUserIdInput)){
-                    break;
-                }
-            }
-
-            //debugging
-            System.out.println(gson.toJson(allUsers.get(i)));
-
-            userToAssociateChannel = allUsers.get(i);
+            userToAssociateChannel = getUserById(allUsers, namedUserIdInput);
 
             if(userToAssociateChannel.getChannels().size() >= 20){
                 res.status(405);
@@ -83,11 +75,61 @@ public class App {
             //fake save the user to the database
             userToAssociateChannel.addChannel(channelToAssociate);
 
-            System.out.println(gson.toJson(allUsers.get(i)));
+            System.out.println(gson.toJson(userToAssociateChannel));
+
+            return "{\"ok\": true}";
+        });
+
+        post("/api/named_users/disassociate",(req, res) ->{
+            //todo refactor the duplicate code
+            JsonInput input;
+            res.type("application/json");
+            NamedUser userToDisassociateChannel;
+
+            try{
+                input = gson.fromJson(req.body(), JsonInput.class);
+            }catch (JsonSyntaxException e){
+                res.status(400);
+                return "{\"Incorrect request body format\": true}";
+            }
+
+            String namedUserIdInput = input.getNamed_user_id();
+            String channelIdInput = input.getChannel_id();
+            String deviceTypeInput = input.getDevice_type();
+
+            if(namedUserIdInput == null || namedUserIdInput.equals("")){
+                res.status(400);
+                return "{\"Named user id not specified\": true}";
+            }
+            if(channelIdInput == null || channelIdInput.equals("")){
+                res.status(400);
+                return "{\"Channel id not specified\": true}";
+            }
+            if(deviceTypeInput == null || deviceTypeInput.equals("")){
+                res.status(400);
+                return "{\"Device type not specified\": true}";
+            }
+
+            userToDisassociateChannel = getUserById(allUsers, namedUserIdInput);
+            Channel channelToDisassociate = new Channel(deviceTypeInput,channelIdInput);
+
+            if(!userToDisassociateChannel.removeChannel(channelToDisassociate)){
+                res.status(400);
+                return "{\"Channel requested to be removed is not associated to user\": true}";
+            }
+
+            //debugging
+            System.out.println(gson.toJson(userToDisassociateChannel));
 
             return "{\"ok\": true}";
         });
     }
+
+    private static NamedUser getUserById(List<NamedUser> allUsers, String namedUserIdInput) {
+        //fake database query
+        return allUsers.get(allUsers.indexOf(new NamedUser(namedUserIdInput)));
+    }
+
     class JsonInput{
         private String channel_id;
         private String device_type;

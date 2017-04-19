@@ -18,6 +18,10 @@ public class NamedUser {
         channels.add(channel);
     }
 
+    public boolean removeChannel(Channel channel){
+        return channels.remove(channel);
+    }
+
     public String getNamed_user_id() {
         return named_user_id;
     }
