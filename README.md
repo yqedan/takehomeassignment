@@ -1,4 +1,4 @@
-## Take Home Assignment for Urban Airship Platform Engineer position
+## Take home test implementing an API with Java and Spark
 
 #### By _**Yusuf Qedan**_
 
